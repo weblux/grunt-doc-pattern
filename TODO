@@ -1,0 +1,36 @@
+List and create all index pages
+- pattern index
+- all section index
+
+Create a src folder for doc pattern template (in an other repository ?)
+
+Correct nav html + active
+
+Refactor code and split into seperate file ? (navigation for example - call with require())
+
+Refactor navigation generation ?
+
+Example:
+
+03-organisms
+|- accordion
+|- grid
+|- page-header
+
+=> Become
+
+components
+|- accordion
+|- grid
+
+page
+|- header
+
+==> More readable and easier to find information
+
+JS for navigation
+
+/!\ main.css modification
+1. Add .doc-version style
+2. Add style to .page
+3. Update style to .page-logo

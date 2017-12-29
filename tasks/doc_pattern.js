@@ -11,6 +11,8 @@
 var marked = require('marked')
 var path = require('path')
 var fs = require('fs')
+var YAML = require('yamljs')
+var nav = require('./helper/navigation')
 
 marked.setOptions({
   smartypants: true,
@@ -42,7 +44,7 @@ module.exports = function (grunt) {
     // Iterate over all specified file groups to extract content
     var files = this.files.map(function (file) {
       // Concat specified files.
-      file.content = file.src.filter(function (filepath) {
+      file.datas = file.src.filter(function (filepath) {
         // Warn on and remove invalid source files (if nonull was set).
         if (!grunt.file.exists(filepath)) {
           grunt.log.warn('Source file "' + filepath + '" not found.')
@@ -55,16 +57,20 @@ module.exports = function (grunt) {
         var fileContent = grunt.file.read(filepath, { encoding: 'utf8' })
         var docs = /---([^]*)---/g.exec(fileContent)
 
-        return (docs !== null ? docs[1] : null)
+        return (docs !== null ? YAML.parse(docs[1]) : null)
       })[0]
 
+      if (file.datas === null) {
+        return file
+      }
+
+      file = nav.check(file)
+
       // Add versioning into the path and convert to html
-      var path = file.dest.split('/')
-      path.splice(2, 0, currentVersion)
-      file.dest = path.join('/').replace('.hbs', '.html')
+      file.dest = path.join(destinationRoot, options.subfolder, currentVersion, file.datas.navigation.section, file.datas.navigation.name) + '.html'
 
       // Create page title
-      file.title = options.title + ' | ' + path[path.length - 1].substr()
+      file.title = options.title + ' | ' + file.datas.navigation.name
       file['logo-title'] = options.title
 
       // Set root path
@@ -77,45 +83,34 @@ module.exports = function (grunt) {
 
     // Remove empty file
     files = files.filter(function (file) {
-      return file.content !== null
+      return file.datas !== null
     })
 
     // Collect navigation items
-    var navigation = {}
-    files.forEach(function (file) {
-      var path = file.dest.split('/')
-      var section = path[3]
-      var filename = path[path.length - 1]
+    var navigation = nav.collect(files, destinationRoot + '/' + options.subfolder + '/' + currentVersion)
 
-      if (navigation[section] === undefined) {
-        navigation[section] = {
-          name: section,
-          href: path[0] + '/' + path[1] + '/' + path[2] + '/' + path[3] + '/index.html',
-          items: []
-        }
-      }
+    // Add all version index into files
+    files.push(allVersionIndex(versions, currentVersion, options))
 
-      navigation[section].items.push({
-        href: file.dest,
-        name: filename.replace('.html', '')
-      })
-    })
+    // Add home index into files
+    files.push(homeIndex(navigation, options, currentVersion))
+
+    // Add section index into files
+    for (var section in navigation) {
+      files.push(sectionIndex(navigation, section, options))
+    }
 
     // Get partial
     var header = grunt.file.read(path.join(__dirname, '/', options.template, '/partial/header.hbs'))
     var footer = grunt.file.read(path.join(__dirname, '/', options.template, '/partial/footer.hbs'))
 
     // Write files
-    files.forEach(function (file) {
-      file.navigation = createNavigation(file, navigation)
+    files.forEach(function (file, index) {
+      file.navigation = nav.create(file, navigation)
       file.versions = createVersion(currentVersion, path.join(file.root, destinationRoot, options.subfolder, 'index.html'))
-      header = assemble(header, file)
-      footer = assemble(footer, file)
 
-      // Markdown to HTML
-      file.content = marked(file.content)
-
-      var content = header + file.content + footer
+      // Markdown to HTML and partial
+      var content = assemble(header, file, index) + marked(file.datas.description) + assemble(footer, file, index)
 
       // Write the destination file.
       grunt.file.write(file.dest, content)
@@ -137,40 +132,6 @@ module.exports = function (grunt) {
     })
   }
 
-  function createNavigation (file, navigation) {
-    var html = `<nav class="page-headernav" id="headernav" role="navigation" aria-labeledby="#headernav-title">
-                  <h1 id="headernav-title">Menu</h1>
-                  <ul class="nav nav--primary">`
-
-    for (var section in navigation) {
-      var sectionLink = createRelativeLink(navigation[section].href, file)
-      var sectionName = navigation[section].name
-      html += '<li><a href="' + sectionLink + '">' + sectionName + '</a><ul class="subnav">'
-
-      var items = navigation[section].items
-      if (items.length) {
-        var length = items.length
-        var index
-
-        for (index = 0; index < length; index++) {
-          var className = 'class="' + ((navigation[section].items[index].href === file.dest) ? 'subnav-item subnav-item--active' : 'subnav-item') + '"'
-          var link = createRelativeLink(navigation[section].items[index].href, file)
-          var name = navigation[section].items[index].name
-          html += '<li><a href="' + link + '" ' + className + '>' + name + '</a></li>'
-        }
-      }
-      html += '</ul></li>'
-    }
-
-    html += '</ul></nav>'
-
-    return html
-  }
-
-  function createRelativeLink (link, file) {
-    return file.root + link
-  }
-
   function createVersion (version, link) {
     return `<div class="doc-version">Version: ${version} - <a href="${link}">See all version</a></div>`
   }
@@ -181,7 +142,7 @@ module.exports = function (grunt) {
 
   function setRootPath (path) {
     var roots = ''
-    path = path.split('/')
+    path = path.split('\\')
 
     path.forEach(function (item, index) {
       if (index) {
@@ -206,5 +167,68 @@ module.exports = function (grunt) {
     })
 
     return versions
+  }
+
+  function allVersionIndex (versions, currentVersion, options) {
+    if (versions.indexOf(currentVersion) === -1) {
+      versions.push(currentVersion)
+    }
+
+    var content = '<ul>'
+    versions.forEach(function (version) {
+      content += '<li><a href="./' + version + '/index.html">' + version + '</a></li>'
+    })
+    content += '</ul>'
+
+    return {
+      title: options.title,
+      'logo-title': options.title,
+      dest: 'docs/patterns/index.html',
+      datas: {
+        description: content
+      },
+      root: '../../',
+      assets: '../../docs/patterns/assets/'
+    }
+  }
+
+  function homeIndex (navigation, options, currentVersion) {
+    var content = '<ul>'
+
+    for (var section in navigation) {
+      content += '<li><a href="./' + navigation[section].name + '/index.html">' + navigation[section].name + '</a></li>'
+    }
+    content += '</ul>'
+
+    return {
+      title: options.title + ' | ' + currentVersion,
+      'logo-title': options.title,
+      dest: `docs/${options.subfolder}/${currentVersion}/index.html`,
+      datas: {
+        description: content
+      },
+      root: '../../../',
+      assets: '../../../docs/patterns/assets/'
+    }
+  }
+
+  function sectionIndex (navigation, section, options) {
+    var content = '<ul>'
+
+    navigation[section].items.forEach(function (item) {
+      content += '<li><a href="./' + item.name + '.html">' + item.name + '</a></li>'
+    })
+    content += '</ul>'
+
+    return {
+      title: options.title + ' | ' + navigation[section].name,
+      'logo-title': options.title,
+      dest: 'docs/patterns/0.1.0/' + section + '/index.html',
+      datas: {
+        description: content
+      },
+      root: '../../../../',
+      assets: '../../../../docs/patterns/assets/'
+    }
   }
 }

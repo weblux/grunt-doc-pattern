@@ -97,7 +97,7 @@ module.exports = function (grunt) {
 
     // Add section index into files
     for (var section in navigation) {
-      files.push(sectionIndex(navigation, section, options))
+      files.push(sectionIndex(navigation, section, options, currentVersion))
     }
 
     // Get partial
@@ -212,7 +212,7 @@ module.exports = function (grunt) {
     }
   }
 
-  function sectionIndex (navigation, section, options) {
+  function sectionIndex (navigation, section, options, currentVersion) {
     var content = '<ul>'
 
     navigation[section].items.forEach(function (item) {
@@ -223,7 +223,7 @@ module.exports = function (grunt) {
     return {
       title: options.title + ' | ' + navigation[section].name,
       'logo-title': options.title,
-      dest: 'docs/patterns/0.1.0/' + section + '/index.html',
+      dest: `docs/${options.subfolder}/${currentVersion}/${section}/index.html`,
       datas: {
         description: content
       },

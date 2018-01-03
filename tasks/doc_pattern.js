@@ -90,14 +90,14 @@ module.exports = function (grunt) {
     var navigation = nav.collect(files, destinationRoot + '/' + options.subfolder + '/' + currentVersion)
 
     // Add all version index into files
-    files.push(allVersionIndex(versions, currentVersion, options))
+    files.push(allVersionIndex(versions, currentVersion, options, destinationRoot))
 
     // Add home index into files
-    files.push(homeIndex(navigation, options, currentVersion))
+    files.push(homeIndex(navigation, options, currentVersion, destinationRoot))
 
     // Add section index into files
     for (var section in navigation) {
-      files.push(sectionIndex(navigation, section, options, currentVersion))
+      files.push(sectionIndex(navigation, section, options, currentVersion, destinationRoot))
     }
 
     // Get partial
@@ -169,7 +169,7 @@ module.exports = function (grunt) {
     return versions
   }
 
-  function allVersionIndex (versions, currentVersion, options) {
+  function allVersionIndex (versions, currentVersion, options, destinationRoot) {
     if (versions.indexOf(currentVersion) === -1) {
       versions.push(currentVersion)
     }
@@ -183,16 +183,16 @@ module.exports = function (grunt) {
     return {
       title: options.title,
       'logo-title': options.title,
-      dest: 'docs/patterns/index.html',
+      dest: `${destinationRoot}/${options.subfolder}/index.html`,
       datas: {
         description: content
       },
       root: '../../',
-      assets: '../../docs/patterns/assets/'
+      assets: `../../${destinationRoot}/${options.subfolder}/assets/`
     }
   }
 
-  function homeIndex (navigation, options, currentVersion) {
+  function homeIndex (navigation, options, currentVersion, destinationRoot) {
     var content = '<ul>'
 
     for (var section in navigation) {
@@ -203,16 +203,16 @@ module.exports = function (grunt) {
     return {
       title: options.title + ' | ' + currentVersion,
       'logo-title': options.title,
-      dest: `docs/${options.subfolder}/${currentVersion}/index.html`,
+      dest: `${destinationRoot}/${options.subfolder}/${currentVersion}/index.html`,
       datas: {
         description: content
       },
       root: '../../../',
-      assets: '../../../docs/patterns/assets/'
+      assets: `../../../${destinationRoot}/${options.subfolder}/assets/`
     }
   }
 
-  function sectionIndex (navigation, section, options, currentVersion) {
+  function sectionIndex (navigation, section, options, currentVersion, destinationRoot) {
     var content = '<ul>'
 
     navigation[section].items.forEach(function (item) {
@@ -223,12 +223,12 @@ module.exports = function (grunt) {
     return {
       title: options.title + ' | ' + navigation[section].name,
       'logo-title': options.title,
-      dest: `docs/${options.subfolder}/${currentVersion}/${section}/index.html`,
+      dest: `${destinationRoot}/${options.subfolder}/${currentVersion}/${section}/index.html`,
       datas: {
         description: content
       },
       root: '../../../../',
-      assets: '../../../../docs/patterns/assets/'
+      assets: `../../../../${destinationRoot}/${options.subfolder}/assets/`
     }
   }
 }

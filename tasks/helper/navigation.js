@@ -1,7 +1,8 @@
 function create (file, navigation) {
   var html = `<nav class="page-headernav" id="headernav" role="navigation" aria-labeledby="#headernav-title">
                 <h1 id="headernav-title">Menu</h1>
-                <ul class="nav nav--primary">`
+                <div class="nav-section nav-section--primary">
+                  <ul class="nav nav--primary">`
 
   for (var section in navigation) {
     var sectionLink = createRelativeLink(navigation[section].href, file)
@@ -40,7 +41,7 @@ function create (file, navigation) {
     html += '</ul></li>'
   }
 
-  html += '</ul></nav>'
+  html += '</ul></div></nav>'
 
   return html
 }

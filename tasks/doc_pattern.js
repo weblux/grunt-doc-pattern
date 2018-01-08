@@ -13,6 +13,7 @@ var path = require('path')
 var fs = require('fs')
 var YAML = require('yamljs')
 var nav = require('./helper/navigation')
+var liveExample = require('./helper/live-example')
 
 marked.setOptions({
   smartypants: true,
@@ -28,6 +29,7 @@ module.exports = function (grunt) {
     var options = this.options({
       subfolder: 'patterns',
       template: '../templates/skizz',
+      helpers: 'src/_helpers',
       title: 'Pattern Doc'
     })
 
@@ -40,6 +42,9 @@ module.exports = function (grunt) {
     if (versions.indexOf(currentVersion) !== -1) {
       grunt.fail.warn('Patterns docs version ' + currentVersion + ' already exist.')
     }
+
+    // Regesiter helpers and partials
+    liveExample.register(grunt, options, this.files)
 
     // Iterate over all specified file groups to extract content
     var files = this.files.map(function (file) {
@@ -55,9 +60,16 @@ module.exports = function (grunt) {
       }).map(function (filepath) {
         // Read file source and extract the usefull content for docs
         var fileContent = grunt.file.read(filepath, { encoding: 'utf8' })
-        var docs = /---([^]*)---/g.exec(fileContent)
+        var docs = /([^]*)---([^]*)---([^]*)/g.exec(fileContent)
 
-        return (docs !== null ? YAML.parse(docs[1]) : null)
+        var datas = null
+        if (docs !== null) {
+          var pattern = docs[1] + docs[3]
+          datas = YAML.parse(docs[2])
+          datas['pattern'] = pattern
+        }
+
+        return datas
       })[0]
 
       if (file.datas === null) {
@@ -110,7 +122,7 @@ module.exports = function (grunt) {
       file.versions = createVersion(currentVersion, path.join(file.root, destinationRoot, options.subfolder, 'index.html'))
 
       // Markdown to HTML and partial
-      var content = assemble(header, file, index) + marked(file.datas.description) + assemble(footer, file, index)
+      var content = assemble(header, file, index) + marked(file.datas.description) + liveExample.create(file) + assemble(footer, file, index)
 
       // Write the destination file.
       grunt.file.write(file.dest, content)

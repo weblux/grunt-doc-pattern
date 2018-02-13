@@ -30,7 +30,8 @@ module.exports = function (grunt) {
       subfolder: 'patterns',
       template: '../templates/skizz',
       helpers: 'src/_helpers',
-      title: 'Pattern Doc'
+      title: 'Pattern Doc',
+      files: false
     })
 
     var destinationRoot = this.target
@@ -79,7 +80,7 @@ module.exports = function (grunt) {
       file = nav.check(file)
 
       // Add versioning into the path and convert to html
-      file.dest = path.join(destinationRoot, options.subfolder, currentVersion, file.datas.navigation.section, file.datas.navigation.name) + '.html'
+      file.dest = path.join(destinationRoot, options.subfolder, currentVersion, safeName(file.datas.navigation.section), safeName(file.datas.navigation.name)) + '.html'
 
       // Create page title
       file.title = options.title + ' | ' + file.datas.navigation.name
@@ -135,7 +136,30 @@ module.exports = function (grunt) {
     grunt.file.recurse(path.join(__dirname, '/', options.template, '/assets/'), function (abspath, rootdir, subdir, filename) {
       grunt.file.copy(abspath, path.join(destinationRoot, options.subfolder, '/assets/', subdir, filename))
     })
+
+    // Copy desire file
+    if (options.files) {
+      grunt.file.recurse(options.files, function (abspath, rootdir, subdir, filename) {
+        grunt.file.copy(abspath, path.join(destinationRoot, options.subfolder, '/assets/img/', subdir, filename))
+      })
+    }
   })
+
+  function safeName (name) {
+    return name.replace(/\s/g, '-')
+               .replace(/é/g, 'e')
+               .replace(/è/g, 'e')
+               .replace(/ê/g, 'e')
+               .replace(/ë/g, 'e')
+               .replace(/à/g, 'a')
+               .replace(/ä/g, 'a')
+               .replace(/û/g, 'u')
+               .replace(/ü/g, 'u')
+               .replace(/ô/g, 'o')
+               .replace(/ö/g, 'o')
+               .replace(/î/g, 'i')
+               .replace(/ï/g, 'i')
+  }
 
   function assemble (template, file) {
     return template.replace(/{{(.*)}}/g, function (match, key) {
@@ -208,7 +232,7 @@ module.exports = function (grunt) {
     var content = '<ul>'
 
     for (var section in navigation) {
-      content += '<li><a href="./' + navigation[section].name + '/index.html">' + navigation[section].name + '</a></li>'
+      content += '<li><a href="./' + safeName(navigation[section].name) + '/index.html">' + navigation[section].name + '</a></li>'
     }
     content += '</ul>'
 
@@ -228,7 +252,7 @@ module.exports = function (grunt) {
     var content = '<ul>'
 
     navigation[section].items.forEach(function (item) {
-      content += '<li><a href="./' + item.name + '.html">' + item.name + '</a></li>'
+      content += '<li><a href="./' + safeName(item.name) + '.html">' + item.name + '</a></li>'
     })
     content += '</ul>'
 

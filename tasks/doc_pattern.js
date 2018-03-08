@@ -31,8 +31,17 @@ module.exports = function (grunt) {
       template: '../templates/skizz',
       helpers: 'src/_helpers',
       title: 'Pattern Doc',
+      _data: false,
       files: false
     })
+
+    if (options._data) {
+      var _data = []
+      grunt.file.recurse(options._data, function (abspath, rootdir, subdir, filename) {
+        var file = grunt.file.read(abspath)
+        _data[filename.split('.')[0]] = file
+      })
+    }
 
     var destinationRoot = this.target
 
@@ -85,12 +94,10 @@ module.exports = function (grunt) {
       // Create page title
       file.title = options.title + ' | ' + file.datas.navigation.name
       file['logo-title'] = options.title
-
       // Set root path
       file.root = setRootPath(file.dest)
       // Set assets path
       file.assets = setAssetsPath(file.root, destinationRoot, options.subfolder)
-
       return file
     })
 
@@ -121,9 +128,8 @@ module.exports = function (grunt) {
     files.forEach(function (file, index) {
       file.navigation = nav.create(file, navigation)
       file.versions = createVersion(currentVersion, path.join(file.root, destinationRoot, options.subfolder, 'index.html'))
-
       // Markdown to HTML and partial
-      var content = assemble(header, file, index) + marked(file.datas.description) + liveExample.create(file) + assemble(footer, file, index)
+      var content = assemble(header, file, index) + marked(file.datas.description) + liveExample.create(file, _data) + assemble(footer, file, index)
 
       // Write the destination file.
       grunt.file.write(file.dest, content)

@@ -32,6 +32,7 @@ module.exports = function(grunt) {
     doc_pattern: {
       default_options: {
         options: {
+
         },
         files: {
           'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']

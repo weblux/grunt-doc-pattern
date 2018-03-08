@@ -24,35 +24,28 @@
   ],
   "_from": "git+https://github.com/weblux/grunt-doc-pattern.git",
   "_id": "grunt-doc-pattern@0.1.0",
+  "_inBundle": false,
   "_inCache": true,
+  "_integrity": "sha1-2/Fp8atAwyY5V/G0UTCFc7Qb0vk=",
   "_location": "/grunt-doc-pattern",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "grunt-doc-pattern@git+https://github.com/weblux/grunt-doc-pattern.git",
-    "scope": null,
-    "escapedName": "grunt-doc-pattern",
-    "name": "grunt-doc-pattern",
+    "type": "git",
+    "raw": "git+https://github.com/weblux/grunt-doc-pattern.git",
     "rawSpec": "git+https://github.com/weblux/grunt-doc-pattern.git",
-    "spec": "git+https://github.com/weblux/grunt-doc-pattern.git",
-    "type": "hosted",
-    "hosted": {
-      "type": "github",
-      "ssh": "git@github.com:weblux/grunt-doc-pattern.git",
-      "sshUrl": "git+ssh://git@github.com/weblux/grunt-doc-pattern.git",
-      "httpsUrl": "git+https://github.com/weblux/grunt-doc-pattern.git",
-      "gitUrl": "git://github.com/weblux/grunt-doc-pattern.git",
-      "shortcut": "github:weblux/grunt-doc-pattern",
-      "directUrl": "https://raw.githubusercontent.com/weblux/grunt-doc-pattern/master/package.json"
-    }
+    "saveSpec": "git+https://github.com/weblux/grunt-doc-pattern.git",
+    "fetchSpec": "https://github.com/weblux/grunt-doc-pattern.git",
+    "gitCommittish": "master"
   },
   "_requiredBy": [
-    "#DEV:/"
+    "#USER",
+    "/"
   ],
-  "_resolved": "git+https://github.com/weblux/grunt-doc-pattern.git#2285d5dc2aaedcaad821ae67f4b73ac6d4e85cd3",
+  "_resolved": "git+https://github.com/weblux/grunt-doc-pattern.git#b714eca2e4e31e78ee6da6afbabacf269f18dcfe",
   "_shasum": "62530a5c2a0c8517a4ef3cd720c3d359f6ea52fb",
   "_shrinkwrap": null,
-  "_spec": "grunt-doc-pattern@git+https://github.com/weblux/grunt-doc-pattern.git",
-  "_where": "C:\\wamp\\www\\test-grunt-init\\trunk",
+  "_spec": "git+https://github.com/weblux/grunt-doc-pattern.git",
+  "_where": "C:\\wamp64\\www\\skizz-2.0.0 branches\\test",
   "author": {
     "name": "Huntedpix",
     "email": "huntedpix@gmail.com"
@@ -60,16 +53,18 @@
   "bugs": {
     "url": "https://github.com/weblux/grunt-doc-pattern/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {},
+  "deprecated": false,
   "description": "A grunt plugin to generate documentation directly from patterns files",
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-clean": "^0.5.0",
     "grunt-contrib-jshint": "^0.9.2",
     "grunt-contrib-nodeunit": "^0.3.3",
-    "marked": "^0.3.6",
     "handlebars": "^4.0.6",
-    "handlebars-helpers": "^0.7.7"
+    "handlebars-helpers": "^0.7.7",
+    "marked": "^0.3.6"
   },
   "engines": {
     "node": ">= 0.8.0"
@@ -87,8 +82,6 @@
   ],
   "name": "grunt-doc-pattern",
   "optionalDependencies": {},
-  "readme": "# grunt-doc-pattern\r\n\r\n> A grunt plugin to generate documentation directly from patterns files\r\n\r\n## Getting Started\r\nThis plugin requires Grunt `~0.4.5`\r\n\r\nIf you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:\r\n\r\n```shell\r\nnpm install grunt-doc-pattern --save-dev\r\n```\r\n\r\nOnce the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:\r\n\r\n```js\r\ngrunt.loadNpmTasks('grunt-doc-pattern');\r\n```\r\n\r\n## The \"doc_pattern\" task\r\n\r\n### Overview\r\nIn your project's Gruntfile, add a section named `doc_pattern` to the data object passed into `grunt.initConfig()`.\r\n\r\n```js\r\ngrunt.initConfig({\r\n  doc_pattern: {\r\n    options: {\r\n      // Task-specific options go here.\r\n    },\r\n    your_target: {\r\n      // Target-specific file lists and/or options go here.\r\n    },\r\n  },\r\n});\r\n```\r\n\r\n### Options\r\n\r\n#### options.separator\r\nType: `String`\r\nDefault value: `',  '`\r\n\r\nA string value that is used to do something with whatever.\r\n\r\n#### options.punctuation\r\nType: `String`\r\nDefault value: `'.'`\r\n\r\nA string value that is used to do something else with whatever else.\r\n\r\n### Usage Examples\r\n\r\n#### Default Options\r\nIn this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`\r\n\r\n```js\r\ngrunt.initConfig({\r\n  doc_pattern: {\r\n    options: {},\r\n    files: {\r\n      'dest/default_options': ['src/testing', 'src/123'],\r\n    },\r\n  },\r\n});\r\n```\r\n\r\n#### Custom Options\r\nIn this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`\r\n\r\n```js\r\ngrunt.initConfig({\r\n  doc_pattern: {\r\n    options: {\r\n      separator: ': ',\r\n      punctuation: ' !!!',\r\n    },\r\n    files: {\r\n      'dest/default_options': ['src/testing', 'src/123'],\r\n    },\r\n  },\r\n});\r\n```\r\n\r\n## Contributing\r\nIn lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).\r\n\r\n## Release History\r\n_(Nothing yet)_\r\n",
-  "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "git://github.com/weblux/grunt-doc-pattern.git"
@@ -96,5 +89,5 @@
   "scripts": {
     "test": "grunt test"
   },
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

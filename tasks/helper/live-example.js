@@ -27,22 +27,47 @@ function registerPartials (grunt, files) {
       var section = path[2].replace(/\d*-/g, '')
       var partialName = section + '-' + filename
       var partial = grunt.file.read(filepath, { encoding: 'utf8' })
+
+      // escape docs in pattern if exist
+      var docs = /([^]*)---([^]*)---([^]*)/g.exec(partial)
+      if (docs !== null) {
+        var pattern = docs[1] + docs[3]
+        partial = pattern
+      }
+
       handlebars.registerPartial(partialName, partial)
     })
   })
 }
 
-function createLiveExample (file) {
+function createLiveExample (file, _datas) {
   if (file.datas.data === undefined) {
     return ''
   }
+
   var example = handlebars.compile(file.datas.pattern)
-  var datas = extend({}, file.datas.data, {root: {site: {settings: {icons: 'filled'}}}})
-  datas = file.datas.data
-  example = example(datas)
+  var datas = file.datas.data
+  // rootDatas to access icons & assets
+  var rootDatas = {
+    site: {settings: {icons: 'filled'}},
+    assets: '../../assets/'
+  }
+
+  // add datas used in patterns, add necessary in the list
+  if (_datas !== undefined) {
+    extend(rootDatas, {
+      datespan: JSON.parse(_datas['datespan'])
+    })
+  }
+
+  example = example(datas, {
+    data: {
+      root: rootDatas
+    }
+  })
 
   return `<h2>Example</h2>
-          <div class="sandbox-example">
+          <div class='sandbox-example'>
             ${example}
           </div>`
 }

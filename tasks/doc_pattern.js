@@ -153,18 +153,18 @@ module.exports = function (grunt) {
 
   function safeName (name) {
     return name.replace(/\s/g, '-')
-               .replace(/é/g, 'e')
-               .replace(/è/g, 'e')
-               .replace(/ê/g, 'e')
-               .replace(/ë/g, 'e')
-               .replace(/à/g, 'a')
-               .replace(/ä/g, 'a')
-               .replace(/û/g, 'u')
-               .replace(/ü/g, 'u')
-               .replace(/ô/g, 'o')
-               .replace(/ö/g, 'o')
-               .replace(/î/g, 'i')
-               .replace(/ï/g, 'i')
+      .replace(/é/g, 'e')
+      .replace(/è/g, 'e')
+      .replace(/ê/g, 'e')
+      .replace(/ë/g, 'e')
+      .replace(/à/g, 'a')
+      .replace(/ä/g, 'a')
+      .replace(/û/g, 'u')
+      .replace(/ü/g, 'u')
+      .replace(/ô/g, 'o')
+      .replace(/ö/g, 'o')
+      .replace(/î/g, 'i')
+      .replace(/ï/g, 'i')
   }
 
   function assemble (template, file) {
@@ -256,7 +256,6 @@ module.exports = function (grunt) {
 
   function sectionIndex (navigation, section, options, currentVersion, destinationRoot) {
     var content = '<ul>'
-
     navigation[section].items.forEach(function (item) {
       content += '<li><a href="./' + safeName(item.name) + '.html">' + item.name + '</a></li>'
     })

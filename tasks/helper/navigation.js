@@ -75,6 +75,7 @@ function check (file) {
 
 function collect (files, destination) {
   var navigation = {}
+
   files.forEach(function (file) {
     var section = file.datas.navigation.section
     var filename = file.datas.navigation.name
@@ -93,7 +94,31 @@ function collect (files, destination) {
     })
   })
 
-  return navigation
+  for (var item in navigation) {
+    navigation[item].items.sort(function (a, b) {
+      if (a.name < b.name) {
+        return -1
+      }
+      if (a.name > b.name) {
+        return 1
+      }
+      return 0
+    })
+  }
+
+  return sortNavigation(navigation)
+}
+
+function sortNavigation (nav) {
+  var sortedNavigation = {}
+
+  Object.keys(nav)
+    .sort()
+    .forEach((key) => {
+      sortedNavigation[key] = nav[key]
+    })
+
+  return sortedNavigation
 }
 
 module.exports = {

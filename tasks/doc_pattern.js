@@ -70,13 +70,27 @@ module.exports = function (grunt) {
       }).map(function (filepath) {
         // Read file source and extract the usefull content for docs
         var fileContent = grunt.file.read(filepath, { encoding: 'utf8' })
-        var docs = /([^]*)---([^]*)---([^]*)/g.exec(fileContent)
-
+        var docs = /([^]*)---([^]*)---([^]*)---([^]*)/g.exec(fileContent)
         var datas = null
+        var pattern
+
+        // if html docs
         if (docs !== null) {
-          var pattern = docs[1] + docs[3]
-          datas = YAML.parse(docs[2])
-          datas['pattern'] = pattern
+          // if docs pattern existing
+          if (docs[2].indexOf('navigation') !== -1) {
+            pattern = docs[1]
+            datas = YAML.parse(docs[2])
+            datas['pattern'] = pattern
+          }
+        } else {
+          // if no html docs
+          docs = /([^]*)---([^]*)---([^]*)/g.exec(fileContent)
+
+          if (docs !== null) {
+            pattern = docs[1] + docs[3]
+            datas = YAML.parse(docs[2])
+            datas['pattern'] = pattern
+          }
         }
 
         return datas

@@ -95,3 +95,4 @@ module.exports = {
   register: register,
   create: createLiveExample
 }
+
